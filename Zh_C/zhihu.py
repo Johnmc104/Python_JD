@@ -153,5 +153,6 @@ if __name__ == '__main__':
     # url = 'https://www.zhihu.com/question/27621722/answer/105331078'
     # zhihu.get_single_answer_content(url)
 
-    question_id = str(raw_input('请输入链接：www.zhihu.com/question/'))
+    print u"请输入链接:"
+    question_id = str(raw_input('www.zhihu.com/question/'))
     zhihu.get_all_answer_content(question_id)
