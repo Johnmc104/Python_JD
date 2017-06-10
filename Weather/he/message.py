@@ -1,5 +1,6 @@
+#!/usr/local/bin/python
 # -*- coding: utf-8 -*-
-import sys,urllib2,json
+import sys,urllib,urllib2,httplib,json
 
 reload(sys)
 sys.setdefaultencoding('utf-8') 
@@ -16,14 +17,12 @@ id_req = urllib2.Request(url)
 id_resp = urllib2.urlopen(id_req).read()
 
 #将JSON转化为Python的数据结构
-json_data = json.loads(id_resp)
-id_data = json_data['HeWeather5'][0]
+id_json_data = json.loads(id_resp)
+id_data = id_json_data['HeWeather5'][0]
 
 #获取城市id的值
 cityid = id_data['basic']['id']
 
-
-#查询天气数据
 all_url = str(baseurl) + 'weather?city=' + str(cityid) + '&key=' + str(ikey)
 req = urllib2.Request(all_url)
 resp = urllib2.urlopen(req).read()
@@ -70,17 +69,29 @@ flu_txt = data['suggestion']['flu']['txt']
 drsg = data['suggestion']['drsg']['brf']
 drsg_txt = data['suggestion']['drsg']['txt']
 
+w1 = "%s今天白天%s,夜间%s,现在%s,%s摄氏度." %(city,weather_day,weather_night,now_weather,now_tmp)
+w2 = "最高%s度,最低%s度,PM2.5:%s,空气质量:%s." %(tmp_high,tmp_low,pm25,air_quality)
+w3 = "%s,%s级." %(now_wind_dir,now_wind_sc)
+w4 = "天气舒适度：%s,%s." %(comf,comf_txt)
+w5 = "穿衣指数：%s,%s." %(drsg,drsg_txt)
+w6 = "流感指数：%s,%s. " %(flu,flu_txt)
 
-w1 = "%s今天白天天气%s,夜间天气%s,现在%s,%s摄氏度。" %(city,weather_day,weather_night,now_weather,now_tmp)
-w2 = "最高气温%s摄氏度,最低气温%s摄氏度,PM2.5:%s,空气质量:%s。" %(tmp_high,tmp_low,pm25,air_quality)
-w3 = "现在%s,%s级。" %(now_wind_dir,now_wind_sc)
-w4 = "天气舒适度：%s,%s" %(comf,comf_txt)
-w5 = "穿衣指数：%s,%s" %(drsg,drsg_txt)
-w6 = "流感指数：%s,%s" %(flu,flu_txt)
+print (w1)
+print (w2)
+print (w3)
+print (w4)
+print (w5)
+print (w6)
 
-print w1
-print w2
-print w3
-print w4
-print w5
-print w6
+mes = w1 + w2
+
+import requests
+requests.post(
+    "https://api.alertover.com/v1/alert",
+    data={
+        "source": "s-82e569ef-57b9-4bd6-ab23-b2099031",
+        "receiver": "g-259d7e81-df26-48a2-aa91-60d0dced",
+        "content": mes,
+        "title": "风云气象站"
+    }
+)
