@@ -85,13 +85,37 @@ print (w6)
 
 mes = w1 + w2
 
-import requests
-requests.post(
-    "https://api.alertover.com/v1/alert",
-    data={
-        "source": "s-82e569ef-57b9-4bd6-ab23-b2099031",
-        "receiver": "g-259d7e81-df26-48a2-aa91-60d0dced",
-        "content": mes,
-        "title": "风云气象站"
-    }
-)
+import urllib
+import urllib2
+
+params = {
+    'api_key': '0dab49b6',
+    'api_secret': 'd8e0ac6465921067',
+    'to': '8615061826156',
+    'from': '441632960961',
+    'text': mes
+}
+
+send_url = 'https://rest.nexmo.com/sms/json?' + urllib.urlencode(params)
+
+request = urllib2.Request(send_url)
+request.add_header('Accept', 'application/json')
+response = urllib2.urlopen(request)
+
+
+import json
+
+#Using the response object from the request
+
+if response.code == 200 :
+    data = response.read()
+    #Decode JSON response from UTF-8
+    decoded_response = json.loads(data.decode('utf-8'))
+    # Check if your messages are succesful
+    messages = decoded_response["messages"]
+    for message in messages:
+        if message["status"] == "0":
+            print "success"
+else :
+    #Check the errors
+    print "unexpected http {code} response from nexmo api". response.code
